@@ -17,13 +17,18 @@ public struct HTTPRequest: Sendable {
     public var headers: [String: String]
     public var body: HTTPBody
     public var timeout: TimeInterval
+    /// Etichetta facoltativa (es. "chunk:3") usata dai trasporti in
+    /// background per associare la risposta al lavoro anche se l'app viene
+    /// sospesa e riavviata dal sistema.
+    public var tag: String?
 
-    public init(url: URL, method: String = "GET", headers: [String: String] = [:], body: HTTPBody = .none, timeout: TimeInterval = 120) {
+    public init(url: URL, method: String = "GET", headers: [String: String] = [:], body: HTTPBody = .none, timeout: TimeInterval = 120, tag: String? = nil) {
         self.url = url
         self.method = method
         self.headers = headers
         self.body = body
         self.timeout = timeout
+        self.tag = tag
     }
 }
 

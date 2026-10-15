@@ -169,7 +169,8 @@ public struct OpenAITranscriptionProvider: TranscriptionProvider {
             method: "POST",
             headers: ["Authorization": "Bearer \(apiKey)", "Content-Type": form.contentType],
             body: .file(bodyURL),
-            timeout: 600
+            timeout: 600,
+            tag: "chunk:\(chunk.spec.index)"
         )
         let response: HTTPResponse
         do {
