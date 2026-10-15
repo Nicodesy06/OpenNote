@@ -9,7 +9,7 @@ import Observation
 final class NetworkMonitor {
     private(set) var isConnected = true
     private(set) var isExpensive = false
-    @ObservationIgnored private let monitor = NWPathMonitor()
+    private let monitor = NWPathMonitor()
     @ObservationIgnored var onReconnect: (() -> Void)?
 
     init() {

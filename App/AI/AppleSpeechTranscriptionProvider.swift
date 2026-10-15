@@ -74,7 +74,7 @@ struct AppleSpeechTranscriptionProvider: TranscriptionProvider {
         }
         let analyzer = SpeechAnalyzer(modules: [transcriber])
         let file = try AVAudioFile(forReading: url)
-        async let collected: [TimedText] = {
+        async let collected: [TimedText] = { () async throws -> [TimedText] in
             var output: [TimedText] = []
             for try await result in transcriber.results {
                 let text = String(result.text.characters).trimmingCharacters(in: .whitespacesAndNewlines)

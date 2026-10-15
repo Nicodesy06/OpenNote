@@ -61,6 +61,13 @@ public struct BackendJobResult: Codable, Sendable, Equatable {
     public var transcriptionProviderID: String
     public var transcriptionModel: String
     public var document: GeneratedDocumentDTO?
+
+    public init(transcript: MergedTranscript, transcriptionProviderID: String, transcriptionModel: String, document: GeneratedDocumentDTO?) {
+        self.transcript = transcript
+        self.transcriptionProviderID = transcriptionProviderID
+        self.transcriptionModel = transcriptionModel
+        self.document = document
+    }
 }
 
 /// Client del backend gestito (vedi cartella `Backend/`). Il backend

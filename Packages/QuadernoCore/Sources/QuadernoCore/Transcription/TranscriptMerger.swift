@@ -13,6 +13,15 @@ public struct TranscriptMergeReport: Codable, Sendable, Equatable {
     public var removedSuspectPhrases: [String]
     public var precision: TimingPrecision
 
+    public init(chunkCount: Int, coverageGaps: [ClosedRange<TimeInterval>], unresolvedOverlapChunks: [Int], emptyChunks: [Int], removedSuspectPhrases: [String], precision: TimingPrecision) {
+        self.chunkCount = chunkCount
+        self.coverageGaps = coverageGaps
+        self.unresolvedOverlapChunks = unresolvedOverlapChunks
+        self.emptyChunks = emptyChunks
+        self.removedSuspectPhrases = removedSuspectPhrases
+        self.precision = precision
+    }
+
     public var isComplete: Bool { coverageGaps.isEmpty }
 }
 
@@ -20,6 +29,12 @@ public struct MergedTranscript: Codable, Sendable, Equatable {
     public var segments: [TranscriptSegmentDTO]
     public var report: TranscriptMergeReport
     public var detectedLanguages: [String]
+
+    public init(segments: [TranscriptSegmentDTO], report: TranscriptMergeReport, detectedLanguages: [String]) {
+        self.segments = segments
+        self.report = report
+        self.detectedLanguages = detectedLanguages
+    }
 
     public var fullText: String {
         segments.map(\.text).joined(separator: " ")

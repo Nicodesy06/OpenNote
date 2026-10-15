@@ -29,16 +29,16 @@ final class JobRunner {
     private(set) var runningJobID: UUID?
     private(set) var liveText = ""
 
-    @ObservationIgnored private let modelContainer: ModelContainer
-    @ObservationIgnored private let fileStore: FileStore
-    @ObservationIgnored private let settings: AppSettings
-    @ObservationIgnored private let keychain: KeychainStore
-    @ObservationIgnored private let maintenance: RecordingMaintenance
-    @ObservationIgnored private let network: NetworkMonitor
+    private let modelContainer: ModelContainer
+    private let fileStore: FileStore
+    private let settings: AppSettings
+    private let keychain: KeychainStore
+    private let maintenance: RecordingMaintenance
+    private let network: NetworkMonitor
     @ObservationIgnored private var currentTask: Task<Void, Never>?
     @ObservationIgnored private var backgroundTaskID: UIBackgroundTaskIdentifier = .invalid
     @ObservationIgnored private var expiredInBackground = false
-    @ObservationIgnored private let logger = Logger(subsystem: "QuadernoAI", category: "JobRunner")
+    private let logger = Logger(subsystem: "QuadernoAI", category: "JobRunner")
     @ObservationIgnored private var lastSave = Date.distantPast
 
     init(modelContainer: ModelContainer, fileStore: FileStore, settings: AppSettings, keychain: KeychainStore, maintenance: RecordingMaintenance, network: NetworkMonitor) {

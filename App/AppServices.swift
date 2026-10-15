@@ -31,7 +31,7 @@ final class AppServices {
     /// proprio indicatore di registrazione e il proprio invito a trascrivere).
     var isEditorPresented = false
 
-    @ObservationIgnored private let logger = Logger(subsystem: "QuadernoAI", category: "AppServices")
+    private let logger = Logger(subsystem: "QuadernoAI", category: "AppServices")
     @ObservationIgnored private var didStart = false
 
     init(root: URL = FileStore.defaultRoot(), inMemory: Bool = false) {

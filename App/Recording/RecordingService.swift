@@ -86,18 +86,18 @@ final class RecordingService {
     /// Ultima registrazione conclusa (per proporre la trascrizione).
     private(set) var lastFinishedRecordingID: UUID?
 
-    @ObservationIgnored private let fileStore: FileStore
-    @ObservationIgnored private let modelContainer: ModelContainer
-    @ObservationIgnored private let settings: AppSettings
-    @ObservationIgnored private let capture = AudioCaptureEngine()
-    @ObservationIgnored private let manifestWriter: ManifestWriter
+    private let fileStore: FileStore
+    private let modelContainer: ModelContainer
+    private let settings: AppSettings
+    private let capture = AudioCaptureEngine()
+    private let manifestWriter: ManifestWriter
     @ObservationIgnored private var manifest: RecordingManifest?
     @ObservationIgnored private var writer: SegmentedAudioWriter?
     @ObservationIgnored private var profile = RecordingProfile.profile(for: .classroom)
     @ObservationIgnored private var observers: [NSObjectProtocol] = []
     @ObservationIgnored private var lastMarkedPage: (id: UUID, time: TimeInterval, kind: PageMarkKind)?
     @ObservationIgnored private var markPersistTask: Task<Void, Never>?
-    @ObservationIgnored private let logger = Logger(subsystem: "QuadernoAI", category: "RecordingService")
+    private let logger = Logger(subsystem: "QuadernoAI", category: "RecordingService")
     /// Callback per avviare il consolidamento a fine registrazione.
     @ObservationIgnored var onRecordingFinished: ((UUID) -> Void)?
 

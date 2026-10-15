@@ -240,7 +240,7 @@ final class TestRecordingController {
 
     private(set) var phase: Phase = .idle
     private(set) var snapshot = SignalAnalyzer.Snapshot(rmsDB: -160, peakDB: -160, quality: .unknown, capturedDuration: 0)
-    @ObservationIgnored private let engine = AudioCaptureEngine()
+    private let engine = AudioCaptureEngine()
     @ObservationIgnored private var player: AVAudioPlayer?
     @ObservationIgnored private var directory: URL?
     @ObservationIgnored private var fileURL: URL?

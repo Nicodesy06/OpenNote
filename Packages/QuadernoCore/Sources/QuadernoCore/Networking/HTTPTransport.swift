@@ -90,8 +90,15 @@ public final class URLSessionTransport: HTTPTransport, @unchecked Sendable {
             urlRequest.setValue(value, forHTTPHeaderField: key)
         }
         switch request.body {
-        case .none, .file:
+        case .none:
             break
+        case .file(let url):
+            #if canImport(FoundationNetworking)
+            // swift-corelibs-foundation: corpo letto da file (chunk ≤ 25 MB).
+            urlRequest.httpBody = try? Data(contentsOf: url)
+            #else
+            _ = url
+            #endif
         case .data(let data):
             urlRequest.httpBody = data
         }
@@ -121,11 +128,15 @@ public final class URLSessionTransport: HTTPTransport, @unchecked Sendable {
                 continuation.resume(returning: HTTPResponse(statusCode: http.statusCode, headers: Self.headers(of: http), body: data ?? Data()))
             }
             let task: URLSessionTask
+            #if canImport(FoundationNetworking)
+            task = session.dataTask(with: urlRequest, completionHandler: completion)
+            #else
             if case .file(let fileURL) = request.body {
                 task = session.uploadTask(with: urlRequest, fromFile: fileURL, completionHandler: completion)
             } else {
                 task = session.dataTask(with: urlRequest, completionHandler: completion)
             }
+            #endif
             task.resume()
         }
     }

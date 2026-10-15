@@ -99,8 +99,11 @@ public enum ChunkPlanner {
             let cut = candidate ?? min(ideal, cursor + maxCore)
             // Evita un ultimo chunk minuscolo: se il resto è sotto la soglia e
             // può essere assorbito senza superare il massimo, si chiude qui.
+            // La regola vale solo se il resto sarebbe davvero l'ultimo chunk
+            // (non più lungo del target).
             let remainder = duration - cut
-            if remainder < config.minimumTailDuration && duration - cursor <= maxCore {
+            let minimumTail = min(config.minimumTailDuration, target / 2)
+            if remainder < minimumTail && remainder <= target && duration - cursor <= maxCore {
                 break
             }
             boundaries.append((cut, candidate != nil))

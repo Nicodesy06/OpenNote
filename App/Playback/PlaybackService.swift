@@ -21,7 +21,7 @@ final class PlaybackService {
     @ObservationIgnored private var timeObserver: Any?
     @ObservationIgnored private var observerCount = 0
     @ObservationIgnored private var endObserver: NSObjectProtocol?
-    @ObservationIgnored private let logger = Logger(subsystem: "QuadernoAI", category: "Playback")
+    private let logger = Logger(subsystem: "QuadernoAI", category: "Playback")
     /// Se una registrazione è in corso la sessione audio non va toccata.
     @ObservationIgnored var isRecordingActive: () -> Bool = { false }
 

@@ -1,0 +1,11 @@
+{
+  "facts": [
+    {"id": "fondazione-1919", "keywords": ["1919", "Weimar"]},
+    {"id": "fondatore", "keywords": ["Walter Gropius"]},
+    {"id": "esempio-tessitura", "keywords": ["tessitura"]},
+    {"id": "dessau-1925", "keywords": ["1925", "Dessau"]},
+    {"id": "werkbund-1907", "keywords": ["1907", "Monaco"]},
+    {"id": "correzione-industrie-artigiani", "keywords": ["industrie", "artigiani"]}
+  ],
+  "forbidden": ["collaborare solo con l'industria"]
+}

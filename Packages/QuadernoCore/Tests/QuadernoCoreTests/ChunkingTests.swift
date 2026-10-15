@@ -46,6 +46,14 @@ final class ChunkPlannerTests: XCTestCase {
         XCTAssertEqual(plan[0].coreEnd, 380)
     }
 
+    func testShortTargetsStillSplitLongRemainders() throws {
+        // Regressione: con target brevi la regola della coda non deve
+        // accorpare tutto il resto in un unico chunk.
+        let plan = try ChunkPlanner.plan(duration: 50, silences: [19, 39], configuration: ChunkPlanConfiguration(targetDuration: 20, maxDuration: 1200, overlap: 4))
+        XCTAssertEqual(plan.map(\.coreEnd), [19, 39, 50])
+        XCTAssertTrue(ChunkPlanner.coverageGaps(of: plan, duration: 50).isEmpty)
+    }
+
     func testMaxDurationFromByteLimit() {
         // 25 MB a 64 kbps ≈ 3277 s; con margine del 15% ≈ 2785 s.
         let seconds = ChunkPlanConfiguration.maxDuration(forByteLimit: 25 * 1024 * 1024, bitrate: 64_000, providerMaxDuration: nil)

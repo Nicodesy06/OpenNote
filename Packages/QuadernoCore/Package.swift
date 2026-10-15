@@ -13,7 +13,9 @@ let package = Package(
         .macOS(.v14)
     ],
     products: [
-        .library(name: "QuadernoCore", targets: ["QuadernoCore"])
+        .library(name: "QuadernoCore", targets: ["QuadernoCore"]),
+        // Worker da riga di comando per il backend gestito (Linux/macOS).
+        .executable(name: "quaderno-worker", targets: ["QuadernoWorker"])
     ],
     targets: [
         .target(
@@ -24,6 +26,14 @@ let package = Package(
             swiftSettings: [
                 .enableExperimentalFeature("StrictConcurrency")
             ]
+        ),
+        .executableTarget(
+            name: "QuadernoWorker",
+            dependencies: ["QuadernoCore"]
+        ),
+        .testTarget(
+            name: "QuadernoWorkerTests",
+            dependencies: ["QuadernoWorker"]
         ),
         .testTarget(
             name: "QuadernoCoreTests",
