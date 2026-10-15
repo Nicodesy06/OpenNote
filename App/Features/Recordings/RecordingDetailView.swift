@@ -162,6 +162,31 @@ struct RecordingDetailView: View {
                 Menu {
                     Button("Rinomina", systemImage: "pencil") { renaming = true }
                     MoveToSubjectMenu(current: recording.subject) { services.content.move(recording, to: $0) }
+                    if let notebooks = recording.subject?.notebooks, !notebooks.isEmpty {
+                        Menu {
+                            ForEach(notebooks.sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }) { notebook in
+                                Button {
+                                    recording.notebook = notebook
+                                    services.content.save()
+                                } label: {
+                                    if recording.notebook?.id == notebook.id {
+                                        Label(notebook.title, systemImage: "checkmark")
+                                    } else {
+                                        Text(notebook.title)
+                                    }
+                                }
+                            }
+                            if recording.notebook != nil {
+                                Divider()
+                                Button("Scollega dal quaderno", role: .destructive) {
+                                    recording.notebook = nil
+                                    services.content.save()
+                                }
+                            }
+                        } label: {
+                            Label("Collega a un quaderno", systemImage: "book")
+                        }
+                    }
                     Button("Condividi audio", systemImage: "square.and.arrow.up") {
                         if let url = services.maintenance.playableURL(for: recording) { shareURL = ExportedFile(url: url) }
                     }

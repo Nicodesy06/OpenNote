@@ -133,6 +133,7 @@ final class RecordingService {
         guard state == .idle else { throw StartError.alreadyRecording }
         state = .starting
         lastError = nil
+        var createdRecordingID: UUID?
         do {
             guard await Self.requestPermission() else { throw StartError.permissionDenied }
             let available = fileStore.availableCapacity()
@@ -152,6 +153,7 @@ final class RecordingService {
             recording.profileName = profile.displayName
             recording.inputDescription = currentInputName()
             context.insert(recording)
+            createdRecordingID = recording.id
             try context.save()
 
             let directory = fileStore.recordingDirectory(recording.id)
@@ -187,7 +189,7 @@ final class RecordingService {
             state = .idle
             capture.detachWriter()
             writer = nil
-            if let id = manifest?.recordingID {
+            if let id = createdRecordingID ?? manifest?.recordingID {
                 discardEmptyRecording(id)
             }
             manifest = nil
