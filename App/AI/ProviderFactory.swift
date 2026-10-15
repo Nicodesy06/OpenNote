@@ -1,5 +1,6 @@
 import Foundation
 import QuadernoCore
+import QuadernoOnDevice
 
 /// Costruisce i provider AI a partire da impostazioni e Keychain. Il
 /// provider di trascrizione e quello di generazione sono indipendenti
@@ -30,7 +31,11 @@ struct ProviderFactory {
 
     func transcriptionProvider(id: String, model: String, checkpointDirectory: URL?) throws -> TranscriptionProvider {
         switch id {
-        case AppleSpeechTranscriptionProvider().id:
+        case AppleSpeechTranscriptionProvider().id, OnDeviceTranscriptionProvider.providerID:
+            // "apple-ondevice" resta valido per i lavori creati dalle versioni precedenti.
+            if let onDevice = OnDeviceModelCatalog.model(id: model), onDevice.engine != .appleSpeech {
+                return OnDeviceTranscriptionProvider(model: onDevice)
+            }
             return AppleSpeechTranscriptionProvider()
         case AppSettings.TranscriptionProviderChoice.backend.rawValue:
             // Il backend esegue l'intero lavoro lato server (BackendJobClient):
@@ -45,6 +50,11 @@ struct ProviderFactory {
             }
             return OpenAITranscriptionProvider(apiKey: key, model: OpenAITranscriptionModel(identifier: model), transport: uploadTransport)
         }
+    }
+
+    /// `true` se il provider elabora l'audio sull'iPad, senza rete.
+    static func isOnDevice(providerID: String) -> Bool {
+        providerID == OnDeviceTranscriptionProvider.providerID || providerID == AppleSpeechTranscriptionProvider().id
     }
 
     func generationProvider(id: String, model: String) throws -> TextGenerationProvider {

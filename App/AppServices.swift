@@ -1,7 +1,9 @@
 import Foundation
 import Observation
 import SwiftData
+import UIKit
 import os
+import QuadernoOnDevice
 
 /// Contenitore dei servizi dell'app, creato una sola volta all'avvio.
 @MainActor
@@ -15,6 +17,8 @@ final class AppServices {
     let modelContainer: ModelContainer
     let settings: AppSettings
     let keychain: KeychainStore
+    /// Download e stato dei modelli di trascrizione sul dispositivo.
+    let onDeviceModels: OnDeviceModelStore
     let recording: RecordingService
     let playback: PlaybackService
     let maintenance: RecordingMaintenance
@@ -41,6 +45,13 @@ final class AppServices {
         let settings = AppSettings()
         self.settings = settings
         self.keychain = KeychainStore()
+        let onDeviceModels = OnDeviceModelStore()
+        self.onDeviceModels = onDeviceModels
+        // Su avviso di memoria si liberano i modelli caricati (centinaia di MB):
+        // verranno ricaricati dal disco al prossimo chunk.
+        NotificationCenter.default.addObserver(forName: UIApplication.didReceiveMemoryWarningNotification, object: nil, queue: .main) { _ in
+            Task { await onDeviceModels.unloadAll() }
+        }
 
         var notice: String?
         let container: ModelContainer

@@ -158,7 +158,7 @@ final class JobRunner {
 
     private func requiresNetwork(_ job: ProcessingJob) -> Bool {
         if job.includesGeneration { return true }
-        return job.transcriptionProviderID != AppleSpeechTranscriptionProvider().id
+        return !ProviderFactory.isOnDevice(providerID: job.transcriptionProviderID)
     }
 
     // MARK: - Esecuzione
@@ -486,7 +486,9 @@ final class JobRunner {
 
     func scheduleBackgroundProcessing() {
         let request = BGProcessingTaskRequest(identifier: Self.backgroundTaskIdentifier)
-        request.requiresNetworkConnectivity = true
+        // I lavori solo sul dispositivo possono riprendere anche senza rete.
+        let pending = ((try? context.fetch(FetchDescriptor<ProcessingJob>())) ?? []).filter { $0.state == .pending || $0.state == .waiting }
+        request.requiresNetworkConnectivity = pending.isEmpty || pending.contains(where: requiresNetwork)
         request.requiresExternalPower = false
         request.earliestBeginDate = Date().addingTimeInterval(60)
         do {

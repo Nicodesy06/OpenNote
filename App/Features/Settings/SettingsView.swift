@@ -1,6 +1,7 @@
 import AVFoundation
 import SwiftUI
 import QuadernoCore
+import QuadernoOnDevice
 
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
@@ -92,8 +93,17 @@ struct SettingsView: View {
                 }
                 Text("Le registrazioni lunghe vengono divise in parti (tagliate sulle pause, con breve sovrapposizione) per rispettare il limite di 25 MB per file. Parti più brevi danno riferimenti all'audio più precisi.")
                     .font(.footnote).foregroundStyle(.secondary)
-            case .appleOnDevice:
-                Text("Trascrizione sul dispositivo: nessun invio dell'audio e nessun costo API, ma accuratezza generalmente inferiore sui termini tecnici, nessuna distinzione degli interlocutori e maggiore consumo di batteria durante l'elaborazione. Su iPadOS 26 usa SpeechAnalyzer; sulle versioni precedenti il riconoscimento classico, a parti brevi.")
+            case .onDevice:
+                NavigationLink {
+                    OnDeviceModelsView()
+                } label: {
+                    LabeledContent("Modello", value: settings.currentOnDeviceModel.displayName)
+                }
+                if !services.onDeviceModels.isInstalled(settings.currentOnDeviceModel) {
+                    Label("Modello da scaricare prima della prima trascrizione.", systemImage: "arrow.down.circle")
+                        .font(.footnote).foregroundStyle(.orange)
+                }
+                Text("L'audio non lascia mai l'iPad e non ci sono costi API. Rispetto ai modelli cloud: nessuna distinzione degli interlocutori, tempi di elaborazione proporzionali alla durata e maggiore consumo di batteria. La sbobinatura AI, se richiesta, invia comunque il testo al provider scelto sotto.")
                     .font(.footnote).foregroundStyle(.secondary)
             case .backend:
                 BackendSettingsFields()

@@ -6,7 +6,7 @@
 |---|---|---|
 | **Personale (Bring Your Own Key)** | Inserisci le tue chiavi API nell'app; le richieste partono dall'iPad verso OpenAI/Anthropic. | Uso personale, nessun server da gestire. |
 | **Backend gestito** | L'app invia l'audio al tuo backend (`Backend/`), che conserva le chiavi e completa il lavoro anche ad app chiusa. | Lezioni lunghe con elaborazione garantita; base per una versione commerciale. |
-| **Sul dispositivo** | Trascrizione con Apple Speech, nessun invio dell'audio. La rielaborazione richiede comunque un provider cloud. | Privacy massima per la trascrizione. |
+| **Sul dispositivo** | Trascrizione offline con un modello a scelta (Parakeet Ultra/V3/Redux, Canary 1B v2, Whisper Large v3/Turbo/Small, SenseVoice, Apple Speech), nessun invio dell'audio e nessuna chiave. La rielaborazione richiede comunque un provider cloud. | Privacy massima per la trascrizione, lezioni senza connessione, zero costi di trascrizione. |
 
 ## Perché non c'è un «Accedi con ChatGPT / Claude»
 
@@ -72,3 +72,21 @@ Prima di ogni lavoro l'app mostra una stima: minuti di audio per il listino dell
 ## Backend gestito
 
 Vedi [`../Backend/README.md`](../Backend/README.md). Nell'app: Impostazioni → Trascrizione → Servizio: *Backend Quaderno AI* → indirizzo e token.
+
+## Modelli di trascrizione sul dispositivo
+
+Impostazioni › Trascrizione › Servizio «Sul dispositivo (offline)» › **Modelli di trascrizione**. Ogni modello si scarica una volta (da Hugging Face, repository CoreML pubblici di FluidInference e Argmax: nessun account né chiave), poi funziona senza rete. Dopo il download l'app carica il modello una volta per compilarlo per il Neural Engine di quell'iPad: per questo compare la fase «Preparazione…».
+
+| Modello | Motore | Dimensione | Lingue | Note |
+|---|---|---|---|---|
+| Parakeet Ultra | FluidAudio | ~630 MB | 25 europee | Consigliato per l'italiano su iPad con almeno 4 GB di RAM; tempi per parola |
+| Whisper Large v3 | WhisperKit | ~626 MB | 99 | Molto accurato, più lento ed energivoro; consigliato con 8 GB di RAM; usa il glossario come prompt |
+| Canary 1B v2 | FluidAudio | ~640 MB | 25 europee | Molto accurato; solo testo (tempi interpolati) |
+| Parakeet V3 | FluidAudio | ~465 MB | 25 europee | Il modello di Whisper Notes |
+| Whisper Large v3 Turbo | WhisperKit | ~632 MB | 99 | Più veloce di Large v3 |
+| Apple Speech | Sistema | — | gestite da iPadOS | Nessun download nell'app; SpeechAnalyzer da iPadOS 26 |
+| Parakeet Redux | FluidAudio | ~220 MB | 25 europee | Compatto; richiede iPadOS 18 |
+| Whisper Small | WhisperKit | ~216 MB | 99 | Per iPad meno recenti |
+| SenseVoice | FluidAudio | ~450 MB | zh, yue, ja, ko, en | **Non** trascrive l'italiano |
+
+L'app suggerisce il modello in base a versione di iPadOS e RAM; i modelli troppo pesanti per l'iPad sono disattivati con il motivo. I modelli sono esclusi dal backup di iCloud e si eliminano dalla stessa schermata.

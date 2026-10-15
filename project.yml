@@ -9,6 +9,8 @@ options:
 packages:
   QuadernoCore:
     path: Packages/QuadernoCore
+  QuadernoOnDevice:
+    path: Packages/QuadernoOnDevice
 settings:
   base:
     SWIFT_VERSION: "5.0"
@@ -21,6 +23,7 @@ targets:
       - path: App
     dependencies:
       - package: QuadernoCore
+      - package: QuadernoOnDevice
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: it.quadernoai.app

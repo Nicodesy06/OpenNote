@@ -1,6 +1,7 @@
 import SwiftData
 import SwiftUI
 import QuadernoCore
+import QuadernoOnDevice
 
 /// Avvio di trascrizione e sbobinatura: modalità, provider, costo stimato e
 /// consenso esplicito all'invio dei dati ai servizi cloud.
@@ -34,7 +35,7 @@ struct GenerateSheet: View {
     private var transcriptionReady: Bool {
         switch settings.transcriptionProvider {
         case .openAI: return services.keychain.hasValue(account: APIKeyAccount.openAI)
-        case .appleOnDevice: return true
+        case .onDevice: return services.onDeviceModels.isInstalled(settings.currentOnDeviceModel)
         case .backend: return !settings.backendURL.isEmpty && services.keychain.hasValue(account: APIKeyAccount.backendToken)
         }
     }
@@ -48,7 +49,7 @@ struct GenerateSheet: View {
     }
 
     private var sendsToCloud: Bool {
-        (needsTranscription && settings.transcriptionProvider != .appleOnDevice) || needsGeneration
+        (needsTranscription && settings.transcriptionProvider != .onDevice) || needsGeneration
     }
 
     private var estimate: CostEstimator.Estimate {
@@ -83,6 +84,15 @@ struct GenerateSheet: View {
                 Section {
                     if needsTranscription {
                         providerRow(title: "Trascrizione", value: transcriptionDescription, ready: transcriptionReady)
+                        if settings.transcriptionProvider == .onDevice {
+                            if !transcriptionReady {
+                                Text("Il modello \(settings.currentOnDeviceModel.displayName) non è ancora scaricato: scaricalo da \"Modifica provider e chiavi\" › Modelli di trascrizione.")
+                                    .font(.caption).foregroundStyle(.orange)
+                            } else if recording.duration > 30 * 60 {
+                                Text("La trascrizione locale di una lezione lunga richiede alcuni minuti e consuma batteria: meglio con l'iPad in carica. Se l'app passa in background iPadOS può sospendere l'elaborazione, che riprende dall'ultima parte completata.")
+                                    .font(.caption).foregroundStyle(.secondary)
+                            }
+                        }
                     }
                     if needsGeneration {
                         providerRow(title: "Sbobinatura", value: usesBackend ? "Backend (\(settings.generationProvider.displayName))" : "\(settings.generationProvider.displayName) · \(settings.currentGenerationModel)", ready: generationReady)
@@ -155,7 +165,7 @@ struct GenerateSheet: View {
     private var transcriptionDescription: String {
         switch settings.transcriptionProvider {
         case .openAI: return "OpenAI · \(settings.openAITranscriptionModel)"
-        case .appleOnDevice: return "Sul dispositivo (nessun invio)"
+        case .onDevice: return "\(settings.currentOnDeviceModel.displayName) sul dispositivo (nessun invio)"
         case .backend: return "Backend gestito"
         }
     }
@@ -166,7 +176,7 @@ struct GenerateSheet: View {
             switch settings.transcriptionProvider {
             case .openAI: parts.append("l'audio della registrazione a OpenAI per la trascrizione")
             case .backend: parts.append("l'audio al backend configurato (\(URL(string: settings.backendURL)?.host ?? settings.backendURL))")
-            case .appleOnDevice: break
+            case .onDevice: break
             }
         }
         if needsGeneration && !usesBackend {

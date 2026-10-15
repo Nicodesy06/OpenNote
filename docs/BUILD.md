@@ -40,6 +40,7 @@ Prodotto → Build (⌘B), destinazione «iPad (simulatore)» o il tuo iPad.
 Le aree con API più recenti, da controllare per prime se il compilatore segnala problemi:
 
 - `App/AI/AppleSpeechTranscriptionProvider.swift`: API `SpeechAnalyzer` di iPadOS 26, confrontate con la sessione WWDC25. Se servisse, il ramo iPadOS 26 si può disattivare temporaneamente lasciando solo `SFSpeechRecognizer`.
+- `Packages/QuadernoOnDevice` (FluidAudio 0.17.7 e WhisperKit 1.1.1, scaricati da Xcode al primo build): API verificate sui sorgenti dei tag, ma il pacchetto non è mai stato compilato (CoreML non esiste su Linux). Se un'API fosse cambiata, gli unici punti di contatto sono `FluidAudioEngine.swift` e `WhisperKitEngine.swift`.
 - `App/Recording/SegmentedAudioWriter.swift` (`AVAudioFile.close()`, iPadOS 18) e `App/Recording/AudioConsolidator.swift` (`AVAssetExportSession.export(to:as:)`, iPadOS 18), entrambi con un'alternativa per iPadOS 17.
 
 ## 4. Test

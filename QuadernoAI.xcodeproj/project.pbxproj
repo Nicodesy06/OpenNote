@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		5DC6E38EC18FAA932A196971 /* QuadernoCore in Frameworks */ = {isa = PBXBuildFile; productRef = CF982C747657336ABFE7787C /* QuadernoCore */; };
+		1A8FD386BEE0741CC29383B5 /* QuadernoOnDevice in Frameworks */ = {isa = PBXBuildFile; productRef = D93EB4891594C5BCBF0DE1E3 /* QuadernoOnDevice */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -25,6 +26,7 @@
 		7AF768ADD8C1E79EC20DD3E8 /* QuadernoAITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = QuadernoAITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E712F8CCC9D8FDD0E5DFC4FA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F1692BD9CC5B5EAD15822FC2 /* QuadernoCore */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = QuadernoCore; sourceTree = "<group>"; };
+		26428D2C8861CDCF9D20D4CF /* QuadernoOnDevice */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = QuadernoOnDevice; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -38,6 +40,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5DC6E38EC18FAA932A196971 /* QuadernoCore in Frameworks */,
+				1A8FD386BEE0741CC29383B5 /* QuadernoOnDevice in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -74,6 +77,7 @@
 			isa = PBXGroup;
 			children = (
 				F1692BD9CC5B5EAD15822FC2 /* QuadernoCore */,
+				26428D2C8861CDCF9D20D4CF /* QuadernoOnDevice */,
 			);
 			path = Packages;
 			sourceTree = "<group>";
@@ -108,6 +112,7 @@
 			name = QuadernoAI;
 			packageProductDependencies = (
 				CF982C747657336ABFE7787C /* QuadernoCore */,
+				D93EB4891594C5BCBF0DE1E3 /* QuadernoOnDevice */,
 			);
 			productName = QuadernoAI;
 			productReference = 81918909E83595C8F4212CCC /* QuadernoAI.app */;
@@ -165,6 +170,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				05DD7445211B2C0F15E6E604 /* XCLocalSwiftPackageReference "Packages/QuadernoCore" */,
+				9EE1A1A2A12EBE0D8BC029E1 /* XCLocalSwiftPackageReference "Packages/QuadernoOnDevice" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 1BADDC1D73C1A20F347483E1 /* Products */;
@@ -403,12 +409,20 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Packages/QuadernoCore;
 		};
+		9EE1A1A2A12EBE0D8BC029E1 /* XCLocalSwiftPackageReference "Packages/QuadernoOnDevice" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/QuadernoOnDevice;
+		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		CF982C747657336ABFE7787C /* QuadernoCore */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = QuadernoCore;
+		};
+		D93EB4891594C5BCBF0DE1E3 /* QuadernoOnDevice */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = QuadernoOnDevice;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

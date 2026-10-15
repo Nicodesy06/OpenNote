@@ -6,6 +6,7 @@ Il progetto include:
   - target app "QuadernoAI" (cartella App/, Info.plist in Config/)
   - target test "QuadernoAITests" (cartella AppTests/)
   - pacchetto locale Packages/QuadernoCore (prodotto QuadernoCore)
+  - pacchetto locale Packages/QuadernoOnDevice (modelli di trascrizione sul dispositivo)
   - schema condiviso con i test dell'app e del pacchetto.
 In alternativa è disponibile project.yml per XcodeGen.
 """
@@ -29,6 +30,7 @@ IDS = {k: oid(k) for k in [
     "appTarget", "testsTarget",
     "appSources", "appFrameworks", "appResources", "testsSources", "testsFrameworks", "testsResources",
     "coreBuildFile", "coreProductDependency", "localPackageRef",
+    "onDeviceBuildFile", "onDeviceProductDependency", "onDevicePackageRef", "onDeviceFolderRef",
     "testsDependency", "testsProxy",
     "projectConfigList", "projectDebug", "projectRelease",
     "appConfigList", "appDebug", "appRelease",
@@ -147,6 +149,7 @@ pbxproj = f"""// !$*UTF8*$!
 
 /* Begin PBXBuildFile section */
 \t\t{I['coreBuildFile']} /* QuadernoCore in Frameworks */ = {{isa = PBXBuildFile; productRef = {I['coreProductDependency']} /* QuadernoCore */; }};
+\t\t{I['onDeviceBuildFile']} /* QuadernoOnDevice in Frameworks */ = {{isa = PBXBuildFile; productRef = {I['onDeviceProductDependency']} /* QuadernoOnDevice */; }};
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -164,6 +167,7 @@ pbxproj = f"""// !$*UTF8*$!
 \t\t{I['testsProduct']} /* QuadernoAITests.xctest */ = {{isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = QuadernoAITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; }};
 \t\t{I['infoPlistRef']} /* Info.plist */ = {{isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; }};
 \t\t{I['packageFolderRef']} /* QuadernoCore */ = {{isa = PBXFileReference; lastKnownFileType = wrapper; path = QuadernoCore; sourceTree = "<group>"; }};
+\t\t{I['onDeviceFolderRef']} /* QuadernoOnDevice */ = {{isa = PBXFileReference; lastKnownFileType = wrapper; path = QuadernoOnDevice; sourceTree = "<group>"; }};
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -177,6 +181,7 @@ pbxproj = f"""// !$*UTF8*$!
 \t\t\tbuildActionMask = 2147483647;
 \t\t\tfiles = (
 \t\t\t\t{I['coreBuildFile']} /* QuadernoCore in Frameworks */,
+\t\t\t\t{I['onDeviceBuildFile']} /* QuadernoOnDevice in Frameworks */,
 \t\t\t);
 \t\t\trunOnlyForDeploymentPostprocessing = 0;
 \t\t}};
@@ -213,6 +218,7 @@ pbxproj = f"""// !$*UTF8*$!
 \t\t\tisa = PBXGroup;
 \t\t\tchildren = (
 \t\t\t\t{I['packageFolderRef']} /* QuadernoCore */,
+\t\t\t\t{I['onDeviceFolderRef']} /* QuadernoOnDevice */,
 \t\t\t);
 \t\t\tpath = Packages;
 \t\t\tsourceTree = "<group>";
@@ -247,6 +253,7 @@ pbxproj = f"""// !$*UTF8*$!
 \t\t\tname = QuadernoAI;
 \t\t\tpackageProductDependencies = (
 \t\t\t\t{I['coreProductDependency']} /* QuadernoCore */,
+\t\t\t\t{I['onDeviceProductDependency']} /* QuadernoOnDevice */,
 \t\t\t);
 \t\t\tproductName = QuadernoAI;
 \t\t\tproductReference = {I['appProduct']} /* QuadernoAI.app */;
@@ -304,6 +311,7 @@ pbxproj = f"""// !$*UTF8*$!
 \t\t\tminimizedProjectReferenceProxies = 1;
 \t\t\tpackageReferences = (
 \t\t\t\t{I['localPackageRef']} /* XCLocalSwiftPackageReference "Packages/QuadernoCore" */,
+\t\t\t\t{I['onDevicePackageRef']} /* XCLocalSwiftPackageReference "Packages/QuadernoOnDevice" */,
 \t\t\t);
 \t\t\tpreferredProjectObjectVersion = 77;
 \t\t\tproductRefGroup = {I['productsGroup']} /* Products */;
@@ -396,12 +404,20 @@ pbxproj = f"""// !$*UTF8*$!
 \t\t\tisa = XCLocalSwiftPackageReference;
 \t\t\trelativePath = Packages/QuadernoCore;
 \t\t}};
+\t\t{I['onDevicePackageRef']} /* XCLocalSwiftPackageReference "Packages/QuadernoOnDevice" */ = {{
+\t\t\tisa = XCLocalSwiftPackageReference;
+\t\t\trelativePath = Packages/QuadernoOnDevice;
+\t\t}};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 \t\t{I['coreProductDependency']} /* QuadernoCore */ = {{
 \t\t\tisa = XCSwiftPackageProductDependency;
 \t\t\tproductName = QuadernoCore;
+\t\t}};
+\t\t{I['onDeviceProductDependency']} /* QuadernoOnDevice */ = {{
+\t\t\tisa = XCSwiftPackageProductDependency;
+\t\t\tproductName = QuadernoOnDevice;
 \t\t}};
 /* End XCSwiftPackageProductDependency section */
 \t}};

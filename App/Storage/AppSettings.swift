@@ -7,13 +7,15 @@ import QuadernoCore
 final class AppSettings: ObservableObject {
     enum TranscriptionProviderChoice: String, CaseIterable, Identifiable {
         case openAI = "openai"
-        case appleOnDevice = "apple-ondevice"
+        /// Modelli sul dispositivo (Parakeet, Whisper, Canary, Apple Speech…):
+        /// il modello è in `onDeviceModelID`.
+        case onDevice = "ondevice"
         case backend = "backend"
         var id: String { rawValue }
         var displayName: String {
             switch self {
             case .openAI: return "OpenAI (cloud)"
-            case .appleOnDevice: return "Apple — sul dispositivo"
+            case .onDevice: return "Sul dispositivo (offline)"
             case .backend: return "Backend Quaderno AI"
             }
         }
@@ -36,6 +38,8 @@ final class AppSettings: ObservableObject {
     // Provider AI
     @Published var transcriptionProvider: TranscriptionProviderChoice { didSet { save(transcriptionProvider.rawValue, "transcriptionProvider") } }
     @Published var openAITranscriptionModel: String { didSet { save(openAITranscriptionModel, "openAITranscriptionModel") } }
+    /// Id del modello di `OnDeviceModelCatalog` usato quando la trascrizione è sul dispositivo.
+    @Published var onDeviceModelID: String { didSet { save(onDeviceModelID, "onDeviceModelID") } }
     @Published var generationProvider: GenerationProviderChoice { didSet { save(generationProvider.rawValue, "generationProvider") } }
     @Published var anthropicModel: String { didSet { save(anthropicModel, "anthropicModel") } }
     @Published var openAITextModel: String { didSet { save(openAITextModel, "openAITextModel") } }
@@ -66,7 +70,11 @@ final class AppSettings: ObservableObject {
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
-        transcriptionProvider = TranscriptionProviderChoice(rawValue: defaults.string(forKey: "transcriptionProvider") ?? "") ?? .openAI
+        let storedProvider = defaults.string(forKey: "transcriptionProvider") ?? ""
+        // "apple-ondevice" era la scelta delle versioni precedenti (solo Apple Speech).
+        transcriptionProvider = storedProvider == "apple-ondevice" ? .onDevice : (TranscriptionProviderChoice(rawValue: storedProvider) ?? .openAI)
+        onDeviceModelID = defaults.string(forKey: "onDeviceModelID")
+            ?? (storedProvider == "apple-ondevice" ? "apple-speech" : DeviceProfile.recommendedOnDeviceModel.id)
         openAITranscriptionModel = defaults.string(forKey: "openAITranscriptionModel") ?? "gpt-transcribe"
         generationProvider = GenerationProviderChoice(rawValue: defaults.string(forKey: "generationProvider") ?? "") ?? .anthropic
         anthropicModel = defaults.string(forKey: "anthropicModel") ?? AnthropicProvider.defaultModel
@@ -95,6 +103,10 @@ final class AppSettings: ObservableObject {
         defaults.set(value, forKey: key)
     }
 
+    var currentOnDeviceModel: OnDeviceModel {
+        OnDeviceModelCatalog.model(id: onDeviceModelID) ?? DeviceProfile.recommendedOnDeviceModel
+    }
+
     var currentGenerationModel: String {
         generationProvider == .anthropic ? anthropicModel : openAITextModel
     }
@@ -102,8 +114,26 @@ final class AppSettings: ObservableObject {
     var currentTranscriptionModel: String {
         switch transcriptionProvider {
         case .openAI: return openAITranscriptionModel
-        case .appleOnDevice: return "on-device"
+        case .onDevice: return onDeviceModelID
         case .backend: return "backend"
         }
+    }
+}
+
+/// Caratteristiche del dispositivo usate per consigliare i modelli locali.
+enum DeviceProfile {
+    static var osMajor: Int { ProcessInfo.processInfo.operatingSystemVersion.majorVersion }
+
+    /// RAM in GB arrotondata (gli iPad dichiarano poco meno del valore nominale).
+    static var ramGB: Int { Int((Double(ProcessInfo.processInfo.physicalMemory) / 1_073_741_824).rounded()) }
+
+    static var recommendedOnDeviceModel: OnDeviceModel {
+        OnDeviceModelCatalog.recommended(osMajor: osMajor, ramGB: ramGB, languages: ["it"])
+            ?? OnDeviceModelCatalog.model(id: "apple-speech")!
+    }
+
+    /// Il modello gira bene su questo iPad (sistema e memoria sufficienti)?
+    static func canRun(_ model: OnDeviceModel) -> Bool {
+        model.minimumOSMajor <= osMajor && model.minimumRAMGB <= ramGB
     }
 }

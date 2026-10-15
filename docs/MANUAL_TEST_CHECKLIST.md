@@ -43,6 +43,9 @@ Da eseguire con build **Release**, batteria non in carica (per le prove energeti
 - [ ] Confronto: tocca un riferimento ▸ nella sbobinatura → l'audio salta al punto, la trascrizione evidenzia i segmenti.
 - [ ] Export PDF e DOCX; apri il DOCX in Word o Pages.
 - [ ] Trascrizione sul dispositivo (iPadOS 26 e iPadOS 17/18): esito e tempi; annota il consumo di batteria.
+- [ ] Modelli di trascrizione: scarica Parakeet Ultra (avanzamento, «Preparazione…», annullamento e ripresa), poi in modalità aereo trascrivi una lezione di 60 minuti; ripeti con Whisper Large v3 Turbo e Canary 1B v2. Annota tempo totale, batteria consumata, temperatura e qualità (`tools/quality_eval`).
+- [ ] Modelli: elimina un modello e verifica che lo spazio torni libero; verifica che i modelli non adatti all'iPad risultino disattivati con il motivo.
+- [ ] Modelli: avvia una trascrizione locale e blocca lo schermo; verifica che alla riapertura riprenda dall'ultima parte completata.
 
 ## Energia (Instruments → Energy Log)
 

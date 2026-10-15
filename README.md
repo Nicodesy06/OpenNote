@@ -5,7 +5,7 @@ App nativa per iPadOS (SwiftUI, PencilKit, AVFoundation, SwiftData) che unisce, 
 - **quaderni** da scrivere con Apple Pencil, organizzati per materia;
 - **registrazione delle lezioni**, anche a schermo bloccato e mentre si scrive;
 - **importazione** di registrazioni esistenti (M4A, MP3, WAV, AAC, MP4);
-- **trascrizione** cloud (OpenAI `gpt-transcribe`) o sul dispositivo (Apple Speech);
+- **trascrizione** cloud (OpenAI `gpt-transcribe`) o **offline sul dispositivo** con il modello che preferisci: Parakeet Ultra/V3/Redux, Canary 1B v2, Whisper Large v3/Turbo/Small, SenseVoice, Apple Speech;
 - **sbobinatura AI** integrale e verificata (Anthropic Claude o OpenAI), scritta come un testo universitario completo;
 - **editor** delle sbobinature con versioni, rigenerazione per sezione, confronto con audio e trascrizione, export PDF/DOCX;
 - **PDF e slide** annotabili con Apple Pencil, **glossario** della materia.
@@ -30,11 +30,12 @@ App/                        App iPadOS
   Features/                 Interfaccia (libreria, materie, quaderni, registratore, sbobinature…)
   Resources/                Asset (icona), catalogo stringhe, manifesto privacy
 AppTests/                   Test dell'app (simulatore/dispositivo)
+Packages/QuadernoOnDevice/  Modelli di trascrizione sul dispositivo (FluidAudio, WhisperKit; solo Apple)
 Packages/QuadernoCore/      Pacchetto Swift multipiattaforma (iPadOS, macOS, Linux)
   Sources/QuadernoCore/     Chunking, merge, client OpenAI/Anthropic, motore di sbobinatura,
                             prompt versionati, verifica, Markdown, export DOCX, client backend
   Sources/QuadernoWorker/   Worker CLI per il backend (ffmpeg + QuadernoCore)
-  Tests/                    81 test (nessuna chiamata di rete reale)
+  Tests/                    87 test (nessuna chiamata di rete reale)
 Backend/                    Backend gestito (FastAPI) con lavori persistenti, Dockerfile, test
 tools/                      Generatore del progetto Xcode, valutazione della qualità
 docs/                       Compilazione, API, architettura, test manuali, ricerca
@@ -44,11 +45,12 @@ docs/                       Compilazione, API, architettura, test manuali, ricer
 
 | Verifica | Esito |
 |---|---|
-| `swift test` su QuadernoCore (Swift 6.1.2, Linux) | **81 test superati**: chunking, deduplica, merge, client OpenAI/Anthropic (anche streaming SSE), motore di sbobinatura con provider simulati, verifica, Markdown, DOCX, client del backend, ffmpeg reale |
+| `swift test` su QuadernoCore (Swift 6.1.2, Linux) | **87 test superati**: catalogo dei modelli sul dispositivo, chunking, deduplica, merge, client OpenAI/Anthropic (anche streaming SSE), motore di sbobinatura con provider simulati, verifica, Markdown, DOCX, client del backend, ffmpeg reale |
 | DOCX generato aperto con `python-docx` | Titoli, elenchi, tabelle, immagini e citazioni riconosciuti |
 | Backend (`pytest`) | **8 test superati**, compreso un **end-to-end** con worker Swift reale, audio reale tagliato da ffmpeg e provider HTTP simulati |
 | `project.pbxproj` | Interpretato da un parser OpenStep indipendente, nessun riferimento pendente |
 | Compilazione dell'app iPadOS | **Non eseguita** (manca Xcode) |
+| Pacchetto `QuadernoOnDevice` | Manifest validato (`swift package dump-package`), sintassi controllata, API di FluidAudio 0.17.7 e WhisperKit 1.1.1 confrontate con i sorgenti dei tag. **Non compilato** (CoreML non esiste su Linux) e **nessun modello eseguito** |
 | Test in `AppTests/` | **Non eseguiti** (richiedono il simulatore iOS) |
 | Prove su iPad fisico | **Non eseguite** |
 | Chiamate reali a OpenAI/Anthropic | **Non eseguite** (nessuna chiave nell'ambiente); i formati seguono la documentazione di ottobre 2026 |
@@ -82,6 +84,8 @@ Legenda: **Completa** = implementata nel codice e coperta da test eseguiti o ver
 | Trascrizione | File lunghi: chunk tagliati sulle pause, sovrapposizione, offset assoluti, deduplica, verifica della copertura, ripresa per chunk | **Completa** (test + end-to-end) |
 | Trascrizione | Upload in background (URLSession background) | Da verificare su iPad |
 | Trascrizione | Apple sul dispositivo (SpeechAnalyzer su iPadOS 26, SFSpeechRecognizer prima) | Da verificare; API di iPadOS 26 confrontate con la sessione WWDC25 |
+| Trascrizione | Modelli offline a scelta (Parakeet Ultra/V3/Redux, Canary 1B v2, Whisper Large v3/Turbo/Small, SenseVoice): catalogo, consiglio in base all'iPad, download con avanzamento e annullamento, eliminazione, spazio occupato | Catalogo e raggruppamento dei tempi **testati**; download ed esecuzione da verificare su iPad |
+| Trascrizione | Accuratezza dei modelli offline sull'italiano delle lezioni | **Non misurata**: l'ordine dei suggerimenti viene da benchmark pubblici |
 | Sbobinatura | Pipeline A–F (preparazione, scaletta, sezioni in streaming, assemblaggio, verifica + correzione, normalizzazione editoriale) | **Completa** nel nucleo (test con provider simulati + end-to-end) |
 | Sbobinatura | Tre modalità, prompt versionati e personalizzabili, glossario | Completa nel nucleo |
 | Sbobinatura | Anti-omissioni e anti-allucinazioni: verifica del modello, controllo locale di numeri e nomi, rapporto di lunghezza, riferimenti ai segmenti | Completa nel nucleo (mai presentata come garanzia) |

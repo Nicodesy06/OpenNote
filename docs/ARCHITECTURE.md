@@ -12,7 +12,12 @@
 │ Storage     SwiftData (metadati) · FileStore (audio, disegni, PDF) ·     │
 │             DrawingStore · KeychainStore · AppSettings                   │
 └─────────────────────────────────────┬───────────────────────────────────┘
-                                      │ import QuadernoCore
+                                      │ import QuadernoCore, QuadernoOnDevice
+┌──────────── QuadernoOnDevice (solo piattaforme Apple, CoreML) ──────────┐
+│ OnDeviceTranscriptionProvider · OnDeviceModelStore (download, spazio) · │
+│ FluidAudioEngine (Parakeet, Canary, SenseVoice) · WhisperKitEngine      │
+└─────────────────────────────────────┬───────────────────────────────────┘
+                                      │ catalogo modelli in QuadernoCore
 ┌──────────────────────── QuadernoCore (Swift, multipiattaforma) ─────────┐
 │ Transcription: ChunkPlanner · TranscriptionPipeline · TranscriptMerger · │
 │                OverlapDeduplicator · OpenAITranscriptionProvider         │
@@ -77,6 +82,16 @@ microfono → AVAudioEngine.inputNode ──tap 4096 frame──▶ downmix mono
 3. **Invio:** al massimo 2 in parallelo, retry con backoff, upload in background. Ogni risultato viene salvato subito in `chunk-NNNN.json`, così una ripresa invia solo i chunk mancanti.
 4. **Merge:** offset assoluti. Con timestamp vale l'appartenenza per punto medio; senza timestamp il testo duplicato si trova allineando le parole normalizzate (tollera bordi troncati e piccole differenze). I casi non risolti finiscono nella diagnostica. Le allucinazioni note su audio silenzioso («Sottotitoli creati dalla comunità Amara.org»…) vengono rimosse e riportate.
 5. **Verifica della copertura:** se resta un buco, il lavoro non viene dichiarato completato.
+
+### Trascrizione sul dispositivo
+
+`OnDeviceModelCatalog` (in QuadernoCore, testato) descrive i modelli: motore, varianti, lingue, dimensione, requisiti di iPadOS e RAM, precisione dei tempi. `QuadernoOnDevice` li esegue:
+
+- **Provider:** `OnDeviceTranscriptionProvider` implementa lo stesso protocollo dei provider cloud, quindi riusa pianificazione dei chunk, checkpoint, merge e verifica della copertura. `requiresNetwork = false`: nessun consenso all'invio e un chunk alla volta.
+- **Tempi:** Parakeet restituisce tempi per token SentencePiece, raggruppati in parole e frasi da `TimedWordGrouper`; Whisper restituisce segmenti; Canary e SenseVoice solo testo (tempi interpolati dalla pipeline).
+- **Risorse:** un solo modello in memoria (attore per motore), rilasciato su avviso di memoria; CPU + Neural Engine, mai GPU, così l'elaborazione è ammessa anche in background; attesa se lo stato termico è critico.
+- **Download:** `OnDeviceModelStore` scarica nella cache di FluidAudio o in `Application Support/OnDeviceModels/WhisperKit`, carica il modello una volta (compilazione CoreML e, per Whisper, tokenizer) e solo allora scrive il marcatore «pronto»: un download interrotto non viene mai scambiato per un modello installato. Cartelle escluse dal backup.
+- **Compatibilità:** i lavori creati con il vecchio identificativo `apple-ondevice` continuano a usare Apple Speech.
 
 ## Motore di sbobinatura (`SbobinaturaEngine`)
 
